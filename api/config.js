@@ -1,37 +1,36 @@
 module.exports = {
-    setupdone: 'true',
+   
+    /**
+     * Information about the Twilio account.
+     */
+    accountSid: 'ACbd936f3bfbacf77ca556cf81383f4f73',
+    authToken: '94b5f081e295e40ddcbe30e4cc342a5d',
+	callerid: '+17606385080',
+    /**
+     * Information about the API.
+     */
+    apipassword: 'nopassword',
+    serverurl: 'http://localhost:3000',
 
     /**
-     * Informations à propos du compte Twilio
+     * Information about the discord webhook
      */
-    accountSid: '',
-    authToken: '',
-	callerid: '+',
-    /**
-     * Informations à propos de l'API
-     */
-    apipassword: '',
-    serverurl: '',
+    discordwebhook: 'https://discord.com/api/webhooks/1178691552885870624/pjE_JUt6w7rfonMwKBM6hvgluckL6vmaXJlVi37EVdbyYcj0fH3IgsVBUDQg4JRtpPrN',
 
     /**
-     * Informations à propos du webhook discord
-     */
-    discordwebhook: '',
-
-    /**
-     * Port sur lequel tourne le serveur express
+     * Port on which the express server runs
      */
     port: process.env.PORT || 80,
 
     /**
-     * Chemins de stockage des fichiers audios
+     * Audio file storage paths.
      */
 
 
 
 
     /**
-     * Contenu des sms selon les services demandés
+     * Content of SMS according to the services requested
      */
     paypalsms: 'pp test 123'
 };

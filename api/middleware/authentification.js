@@ -1,22 +1,22 @@
 module.exports = (request, response, next) => {
   /**
-   * Fichier contenant les configurations nécéssaires au bon fonctionnement du système
+   * File containing the configurations necessary for the proper functioning of the system.
    */
   const config = require('../config');
 
   try {
       /**
-       * Ici l'on récupère le mot de passe de l'api, par requête GET ou POST
+       * Here we recover the API password, by GET or POST request.
        */
       const pass = request.body.password || request.params.apipassword;
 
       /**
-       * On vérifie si le mot de passe de l'api n'est pas vide, si oui, erreur de sécurité et on retourne une erreur
+       * We check if the API password is not empty, if yes, security error and we return an error.
        */
       if (config.apipassword == '') error('Your API Password is not set, look at your config file.', 401);
 
       /**
-       * Selon les cas d'utilisation, l'on renvoit un code d'erreur où alors l'on next() => signifie que tout est bon et que la fonction passe
+       * Depending on the use case, we return an error code or then we next() => means that everything is good and that the function passes.
        */
       switch (pass) {
           case ' ':

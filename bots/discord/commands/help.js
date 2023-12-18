@@ -1,16 +1,16 @@
 module.exports = function(m) {
   /**
-   * Récupération du fichier config
+   *Retrieving the config file.
    */
   const config = require('../config');
 
   /**
-   * Vérification de la commande, si help a été tapé alors contineur
+   * Verification of the command, if help was typed then contineur.
    */
   if (m.command !== "help") return false;
 
   /**
-   * Création du message embed fixe, présentation des commandes
+   * Creation of fixed embed message, presentation of commands.
    */
   const embed = {
       "title": "Help, commands & informations",
@@ -22,7 +22,7 @@ module.exports = function(m) {
   };
 
   /**
-   * Envoi du message embed
+   * Sending the embed message.
    */
   return m.message.channel.send({ embed });
 }

