@@ -5,7 +5,7 @@ I will install the bot for a fee.
 
 Ask questions outside of setup via ISSUES, not telegram
 
-Telegram for installation : https://t.me/coreline76
+Telegram for installation : @Bab_Genius
 
 1-)Added SMS Spam Feature
 
